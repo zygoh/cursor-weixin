@@ -1,4 +1,5 @@
 node_modules/
+.cursor/mcp.json
 .cursor/weixin-inbox/*.json
 .cursor/weixin-inbox/*.pid
 .cursor/weixin-inbox/*.log

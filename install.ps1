@@ -40,15 +40,28 @@ if (-not (Test-Path (Join-Path $cursorDir "cli.json")) -and (Test-Path $cliExamp
   Copy-Item $cliExample (Join-Path $cursorDir "cli.json")
 }
 
-$mcpExample = Join-Path $RepoRoot "examples\mcp.json"
-if (-not (Test-Path (Join-Path $cursorDir "mcp.json")) -and (Test-Path $mcpExample)) {
-  Copy-Item $mcpExample (Join-Path $cursorDir "mcp.json")
-}
+$mcpPath = Join-Path $cursorDir "mcp.json"
+$wsAbs = (Resolve-Path $WorkspaceRoot).Path -replace '\\', '/'
+$inboxAbs = (Join-Path $cursorDir "weixin-inbox") -replace '\\', '/'
+$mcpDirAbs = (Join-Path $env:USERPROFILE ".weixin-mcp") -replace '\\', '/'
+$channelIndex = (Join-Path $channelDst "index.mjs") -replace '\\', '/'
+@{
+  mcpServers = @{
+    weixin = @{
+      command = "node"
+      args    = @($channelIndex)
+      env     = @{
+        WEIXIN_MCP_DIR   = $mcpDirAbs
+        WEIXIN_INBOX_DIR = $inboxAbs
+      }
+    }
+  }
+} | ConvertTo-Json -Depth 5 | Set-Content -Path $mcpPath -Encoding UTF8
 
 Write-Host "Installed to $cursorDir"
 Write-Host "Next:"
 Write-Host "  1. npx weixin-mcp login"
-Write-Host "  2. .cursor/mcp.json installed from examples (or merge into user MCP config)"
+Write-Host "  2. .cursor/mcp.json written with absolute paths (required for headless agent.cmd)"
 if (-not $WeixinOnlyHooks) {
   Write-Host "  3. Merge examples/hooks.merge-ai-write.json (or hooks.json) into .cursor/hooks.json"
 } else {

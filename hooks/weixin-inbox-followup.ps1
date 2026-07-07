@@ -20,5 +20,22 @@ if (-not $status.Alive) {
   & "$PSScriptRoot\weixin-wake-start.ps1"
 }
 
+# watch-loop (poll → inbox) must also stay alive; wake-loop alone cannot receive new messages
+$inbox = Get-WeixinInboxDir
+$watchPidFile = Join-Path $inbox "watch.pid"
+$watchAlive = $false
+if (Test-Path $watchPidFile) {
+  $watchPid = (Get-Content $watchPidFile -Raw -ErrorAction SilentlyContinue).Trim()
+  if ($watchPid) {
+    $watchAlive = [bool](Get-Process -Id $watchPid -ErrorAction SilentlyContinue)
+  }
+}
+if (-not $watchAlive) {
+  if ($watchPid) {
+    Stop-Process -Id ([int]$watchPid) -Force -ErrorAction SilentlyContinue
+  }
+  & "$PSScriptRoot\weixin-watch-start.ps1"
+}
+
 Write-Output '{}'
 exit 0
