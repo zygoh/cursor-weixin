@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "weixin": {
+      "command": "node",
+      "args": ["${workspaceFolder}/.cursor/weixin-channel/index.mjs"],
+      "env": {
+        "WEIXIN_MCP_DIR": "${env:USERPROFILE}/.weixin-mcp",
+        "WEIXIN_INBOX_DIR": "${workspaceFolder}/.cursor/weixin-inbox"
+      }
+    }
+  }
+}

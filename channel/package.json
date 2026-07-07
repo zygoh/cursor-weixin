@@ -1,0 +1,12 @@
+{
+  "name": "weixin-channel",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "WeChat channel MCP for Cursor — push inbound messages via claude/channel",
+  "main": "index.mjs",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.27.1",
+    "weixin-mcp": "^1.7.7"
+  }
+}

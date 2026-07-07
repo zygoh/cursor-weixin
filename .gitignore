@@ -1,0 +1,7 @@
+node_modules/
+.cursor/weixin-inbox/*.json
+.cursor/weixin-inbox/*.pid
+.cursor/weixin-inbox/*.log
+.cursor/weixin-inbox/*.heartbeat
+.cursor/weixin-inbox/watch-loop.ps1
+.DS_Store
