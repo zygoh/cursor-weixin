@@ -18,12 +18,11 @@ function Get-AgentCommand {
 
 function Invoke-AgentWake {
   param([string]$Prompt)
-  $agent = Get-AgentCommand
-  if (-not $agent) { return $false }
-  Start-Process -FilePath $agent -ArgumentList @(
-    "--continue", "--trust", "-p", $Prompt, "--force"
-  ) -WorkingDirectory $workspace -WindowStyle Hidden | Out-Null
-  return $true
+  $agentChild = Join-Path $PSScriptRoot "..\..\..\.cursor\hooks\agent-child.ps1"
+  if (-not (Test-Path $agentChild)) { return $false }
+  . $agentChild
+  $r = Invoke-ChildAgentWake -Role weixin -TaskPrompt $Prompt
+  return $r.ok
 }
 
 New-Item -ItemType Directory -Force -Path $inbox | Out-Null
@@ -75,7 +74,12 @@ After replying, set each inbox JSON status to "done".
       if (Invoke-AgentWake -Prompt $prompt) {
         Add-Content -Path $logFile -Value "$(Get-Date -Format o) agent-wake pending=$($newPending.Count)"
       } else {
-        Add-Content -Path $logFile -Value "$(Get-Date -Format o) pending=$($newPending.Count) wake-failed (await stop-hook)"
+        # Wake failed (child busy or spawn error): un-mark so next cycle retries.
+        foreach ($entry in $newPending) {
+          $id = $entry.Data.id
+          if ($id) { $notified.Remove($id) | Out-Null }
+        }
+        Add-Content -Path $logFile -Value "$(Get-Date -Format o) pending=$($newPending.Count) wake-failed (retry next cycle)"
       }
     }
 

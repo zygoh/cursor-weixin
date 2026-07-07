@@ -1,3 +1,14 @@
 {
-  "approvalMode": "unrestricted"
+  "permissions": {
+    "allow": [
+      "Shell(**)",
+      "Read(**)",
+      "Write(**)",
+      "Grep(**)",
+      "Glob(**)",
+      "Mcp(**)",
+      "Delete(**)"
+    ],
+    "deny": []
+  }
 }

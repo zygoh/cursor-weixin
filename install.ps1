@@ -40,10 +40,15 @@ if (-not (Test-Path (Join-Path $cursorDir "cli.json")) -and (Test-Path $cliExamp
   Copy-Item $cliExample (Join-Path $cursorDir "cli.json")
 }
 
+$mcpExample = Join-Path $RepoRoot "examples\mcp.json"
+if (-not (Test-Path (Join-Path $cursorDir "mcp.json")) -and (Test-Path $mcpExample)) {
+  Copy-Item $mcpExample (Join-Path $cursorDir "mcp.json")
+}
+
 Write-Host "Installed to $cursorDir"
 Write-Host "Next:"
 Write-Host "  1. npx weixin-mcp login"
-Write-Host "  2. Merge examples/mcp.json into Cursor MCP config"
+Write-Host "  2. .cursor/mcp.json installed from examples (or merge into user MCP config)"
 if (-not $WeixinOnlyHooks) {
   Write-Host "  3. Merge examples/hooks.merge-ai-write.json (or hooks.json) into .cursor/hooks.json"
 } else {

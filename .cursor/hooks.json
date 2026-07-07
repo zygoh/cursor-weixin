@@ -9,7 +9,7 @@
     "stop": [
       {
         "command": ".cursor/hooks/weixin-inbox-followup.ps1",
-        "loop_limit": null
+        "loop_limit": 3
       }
     ]
   }
