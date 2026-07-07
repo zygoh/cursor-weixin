@@ -1,0 +1,32 @@
+---
+description: 微信 Channel — Cursor 开着时主动收消息并 reply 回微信
+globs:
+alwaysApply: true
+---
+
+# 微信 ClawBot — Channel 主动回复
+
+**Cursor 开着 + 本会话加载 weixin MCP 时**，微信消息会主动 push 进 Agent（类似 Telegram Channel）。
+
+## 机制
+
+- `.cursor/weixin-channel/`：MCP Channel 服务，后台 long-poll 微信，通过 `claude/channel` push 到当前会话。
+- 消息格式：`<channel source="weixin" user="..." context_token="..." ts="...">正文</channel>`
+- **必须用 `reply` 工具回微信**（`weixin_send` 亦可）；Chat 里的文字不会发到微信。
+- **限制**：Cursor 须开着且本 Chat 已加载 MCP；Agent 忙时消息排队，下一轮一起处理。
+- **兜底**：`.cursor/hooks/weixin-inbox-followup.ps1` 在 Agent 每轮结束时 poll，用 `followup_message` 续跑。
+- **sessionStart 自启**：`weixin-session-start.ps1` 会自动起 `weixin-watch-start` + `weixin-wake-start`（wake-loop 后台保活；空闲时用 `agent.cmd --continue` 唤醒处理 inbox）。
+
+## 收到 channel 或 followup 时
+
+1. 读 `<channel>` 或 followup 里的正文（**不要 weixin_poll**）
+2. 用 `reply`：`user` + `context_token` 来自 channel 属性，`text` 为回复内容
+3. 简短、直接，不要解释架构
+
+## MCP 工具
+
+- `reply` — 回微信（首选）
+- `weixin_send` / `weixin_contacts`
+
+数据目录：`%USERPROFILE%\.weixin-mcp`（可用环境变量 `WEIXIN_MCP_DIR` 覆盖）  
+访问控制：`%USERPROFILE%\.weixin-mcp\access.json`

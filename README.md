@@ -23,38 +23,42 @@ stop hook → weixin-inbox-followup → followup_message 续跑
 | `channel/` | MCP Channel 服务（`index.mjs` + `package.json`） |
 | `hooks/` | Cursor Hooks（sessionStart / stop / wake-loop） |
 | `rules/weixin-mcp.mdc` | Agent 规则：必须用 `reply` 回微信 |
-| `examples/` | `hooks.json`、`mcp.json` 示例 |
+| `examples/` | `hooks.json`、`hooks.merge-ai-write.json`、`mcp.json` |
+| `docs/DEDICATED-CHAT.md` | **独立窗口专管微信**（与 OKX 分开） |
 | `install.ps1` | 一键安装到工作区 `.cursor/` |
 
-## 安装
+## 安装到已有工作区（如 ai-write）
 
 ```powershell
-git clone https://github.com/zygoh/cursor-weixin.git
-cd your-workspace
-powershell -NoProfile -ExecutionPolicy Bypass -File path\to\cursor-weixin\install.ps1
+powershell -NoProfile -ExecutionPolicy Bypass -File F:\AI\cursor-weixin\install.ps1 -WorkspaceRoot F:\AI\ai-write
 ```
 
-### 手动步骤
+然后：
 
-1. **微信登录**：`npx weixin-mcp login`（数据在 `%USERPROFILE%\.weixin-mcp`）
-2. **MCP**：将 `examples/mcp.json` 合并进 Cursor MCP 配置
-3. **Hooks**：将 `examples/hooks.json` 合并进 `.cursor/hooks.json`
-4. **访问控制**：编辑 `%USERPROFILE%\.weixin-mcp\access.json` 的 `allowFrom`
-5. **（推荐）** `.cursor/cli.json` 设 `approvalMode: unrestricted`，便于 wake-loop 自动放行
+1. `npx weixin-mcp login`
+2. 合并 `examples/mcp.json` 到 Cursor MCP 配置
+3. 合并 `examples/hooks.merge-ai-write.json` 到 `.cursor/hooks.json`（或只用 `hooks.json` 做纯微信工作区）
+4. （推荐）复制 `examples/cli.json` → `.cursor/cli.json`
+
+## 独立 Chat 专管微信（与 OKX 分开）
+
+见 **[docs/DEDICATED-CHAT.md](docs/DEDICATED-CHAT.md)**。
+
+要点：**新开 Cursor 窗口，Open Folder 选本仓库**；ai-write 窗口去掉 weixin hooks。
 
 ## 环境变量
 
 | 变量 | 默认 | 说明 |
 |------|------|------|
 | `WEIXIN_MCP_DIR` | `%USERPROFILE%\.weixin-mcp` | weixin-mcp 数据目录 |
-| `WEIXIN_INBOX_DIR` | `<workspace>/.cursor/weixin-inbox` | inbox JSON |
-| `CURSOR_WEIXIN_WORKSPACE` | 自动推断 | 工作区根目录 |
+| `WEIXIN_INBOX_DIR` | `<workspace>/.cursor/weixin-inbox` | inbox JSON（可指向共享路径） |
+| `CURSOR_WEIXIN_WORKSPACE` | 自动推断 | Agent 工作区根（`agent --continue` 的 cwd） |
 
 ## 注意
 
-- 唤醒 Agent 必须用 **`agent.cmd`**，不要用 `agent.ps1`（否则 Windows 会用记事本打开）。
-- wake-loop 每 20 分钟自旋退出，由 sessionStart / maintenance 重启。
+- 唤醒必须用 **`agent.cmd`**，勿用 `agent.ps1`（否则会弹记事本）。
 - Chat 里打字不会发到微信；只有 MCP `reply` / `weixin_send` 会发。
+- wake-loop 常驻，不再 20 分钟自退。
 
 ## License
 

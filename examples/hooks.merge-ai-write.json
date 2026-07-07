@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "hooks": {
+    "sessionStart": [
+      {
+        "command": ".cursor/hooks/asp-watch-start.ps1"
+      },
+      {
+        "command": ".cursor/hooks/weixin-session-start.ps1"
+      }
+    ],
+    "stop": [
+      {
+        "command": ".cursor/hooks/weixin-inbox-followup.ps1",
+        "loop_limit": null
+      },
+      {
+        "command": ".cursor/hooks/asp-inbox-followup.ps1",
+        "loop_limit": 5
+      }
+    ]
+  }
+}
